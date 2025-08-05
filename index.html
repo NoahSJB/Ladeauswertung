@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektroauto Ladekosten Rechner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #171a20;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 600;
+            color: #171a20;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #5c5e62;
+            font-weight: 400;
+        }
+
+        .calculator {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e3e4e6;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 40px;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #171a20;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e3e4e6;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #171a20;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3c65f5;
+            box-shadow: 0 0 0 3px rgba(60, 101, 245, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: #a0a2a8;
+            font-weight: 400;
+        }
+
+        .slider-container {
+            position: relative;
+            margin-top: 16px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e3e4e6;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3c65f5;
+            cursor: pointer;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(60, 101, 245, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(60, 101, 245, 0.4);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3c65f5;
+            cursor: pointer;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(60, 101, 245, 0.3);
+        }
+
+        .slider-value {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #171a20;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .slider-value::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #171a20;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #5c5e62;
+        }
+
+        .results {
+            background: linear-gradient(135deg, #f8f9fb 0%, #ffffff 100%);
+            border-radius: 12px;
+            padding: 32px;
+            border: 1px solid #e3e4e6;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e3e4e6;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            color: #5c5e62;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #171a20;
+        }
+
+        .result-value.highlight {
+            color: #3c65f5;
+            font-size: 1.5rem;
+        }
+
+        .battery-visual {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .battery {
+            display: inline-block;
+            width: 200px;
+            height: 80px;
+            border: 3px solid #171a20;
+            border-radius: 8px;
+            position: relative;
+            background: #ffffff;
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 30px;
+            background: #171a20;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3c65f5, #4c7cf5);
+            border-radius: 4px;
+            transition: all 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .battery-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .battery-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            .title {
+                font-size: 2.2rem;
+            }
+
+            .calculator {
+                padding: 30px 20px;
+            }
+
+            .battery {
+                width: 160px;
+                height: 60px;
+            }
+
+            .battery::after {
+                width: 6px;
+                height: 24px;
+                right: -9px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px 0;
+            border-top: 1px solid #e3e4e6;
+            color: #5c5e62;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Ladekosten Rechner</h1>
+            <p class="subtitle">Berechnen Sie die Kosten für das Laden Ihres Elektroautos</p>
+        </div>
+
+        <div class="calculator">
+            <div class="form-group">
+                <label class="label" for="currentCharge">Aktueller Ladestand (%)</label>
+                <input type="number" id="currentCharge" class="input-field" min="0" max="100" value="20" placeholder="z.B. 20">
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="targetCharge">Gewünschter Ladestand (%)</label>
+                <div class="slider-container">
+                    <div class="slider-value" id="targetValue">80%</div>
+                    <input type="range" id="targetCharge" class="slider" min="0" max="100" value="80">
+                    <div class="slider-labels">
+                        <span>0%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="batterySize">Batteriekapazität (kWh)</label>
+                <input type="number" id="batterySize" class="input-field" min="1" step="0.1" value="75" placeholder="z.B. 75">
+            </div>
+
+            <div class="form-group">
+                <label class="label" for="pricePerKwh">Strompreis (Cent/kWh)</label>
+                <input type="number" id="pricePerKwh" class="input-field" min="0" step="0.1" value="35" placeholder="z.B. 35">
+            </div>
+
+            <div class="battery-visual">
+                <div class="battery">
+                    <div class="battery-fill" id="batteryFill"></div>
+                    <div class="battery-percentage" id="batteryPercentage">80%</div>
+                </div>
+            </div>
+
+            <div class="results fade-in" id="results">
+                <div class="result-item">
+                    <span class="result-label">Zu ladende Energie</span>
+                    <span class="result-value" id="energyToLoad">45.0 kWh</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Ladekosten</span>
+                    <span class="result-value highlight" id="totalCost">15.75 €</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Noah Blesch. Alle Rechte vorbehalten.</p>
+        </div>
+    </div>
+
+    <script>
+        const currentChargeInput = document.getElementById('currentCharge');
+        const targetChargeSlider = document.getElementById('targetCharge');
+        const targetValue = document.getElementById('targetValue');
+        const batterySizeInput = document.getElementById('batterySize');
+        const pricePerKwhInput = document.getElementById('pricePerKwh');
+        const energyToLoadSpan = document.getElementById('energyToLoad');
+        const totalCostSpan = document.getElementById('totalCost');
+        const batteryFill = document.getElementById('batteryFill');
+        const batteryPercentage = document.getElementById('batteryPercentage');
+
+        function updateSliderPosition() {
+            const value = targetChargeSlider.value;
+            const percentage = (value - targetChargeSlider.min) / (targetChargeSlider.max - targetChargeSlider.min);
+            targetValue.style.left = `${percentage * 100}%`;
+            targetValue.textContent = `${value}%`;
+        }
+
+        function updateBatteryVisual() {
+            const targetCharge = parseInt(targetChargeSlider.value);
+            batteryFill.style.width = `${targetCharge}%`;
+            batteryPercentage.textContent = `${targetCharge}%`;
+        }
+
+        function calculateCosts() {
+            const currentCharge = parseFloat(currentChargeInput.value) || 0;
+            const targetCharge = parseFloat(targetChargeSlider.value) || 0;
+            const batterySize = parseFloat(batterySizeInput.value) || 0;
+            const pricePerKwh = parseFloat(pricePerKwhInput.value) || 0;
+
+            if (targetCharge <= currentCharge) {
+                energyToLoadSpan.textContent = '0.0 kWh';
+                totalCostSpan.textContent = '0.00 €';
+                return;
+            }
+
+            const chargePercentage = (targetCharge - currentCharge) / 100;
+            const energyToLoad = batterySize * chargePercentage;
+            const totalCost = (energyToLoad * pricePerKwh) / 100;
+
+            energyToLoadSpan.textContent = `${energyToLoad.toFixed(1)} kWh`;
+            totalCostSpan.textContent = `${totalCost.toFixed(2)} €`;
+        }
+
+        // Event listeners
+        targetChargeSlider.addEventListener('input', function() {
+            updateSliderPosition();
+            updateBatteryVisual();
+            calculateCosts();
+        });
+
+        [currentChargeInput, batterySizeInput, pricePerKwhInput].forEach(input => {
+            input.addEventListener('input', calculateCosts);
+        });
+
+        // Initialize
+        updateSliderPosition();
+        updateBatteryVisual();
+        calculateCosts();
+
+        // Smooth animations for inputs
+        document.querySelectorAll('.input-field').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Validate input ranges
+        currentChargeInput.addEventListener('input', function() {
+            if (this.value > 100) this.value = 100;
+            if (this.value < 0) this.value = 0;
+        });
+
+        batterySizeInput.addEventListener('input', function() {
+            if (this.value < 0) this.value = 0;
+        });
+
+        pricePerKwhInput.addEventListener('input', function() {
+            if (this.value < 0) this.value = 0;
+        });
+    </script>
+</body>
+</html>
